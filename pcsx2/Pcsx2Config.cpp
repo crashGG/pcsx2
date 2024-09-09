@@ -636,7 +636,7 @@ Pcsx2Config::GSOptions::GSOptions()
 	OsdShowHardwareInfo = false;
 	OsdShowVideoCapture = true;
 	OsdShowInputRec = true;
-	hw_mipmap_mode = 1;
+
 	HWDownloadMode = GSHardwareDownloadMode::Enabled;
 	HWSpinGPUForReadbacks = false;
 	HWSpinCPUForReadbacks = false;
