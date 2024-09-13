@@ -570,7 +570,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* dialog, QWidget* 
 			   "Fixes some processing effects such as the shadows in the Jak series and radiosity in GTA:SA."));
 
 		dialog->registerWidgetHelp(
-			m_ui.swMipmap, tr("Mipmapping"), tr("Checked"), tr("Enables mipmapping, which some games require to render correctly."));
+			m_ui.swMipmap, tr("Mipmapping"), tr("Checked"), tr("Enables mipmapping, which some games require to render correctly. Mipmapping uses progressively lower resolution variants of textures at progressively further distances to reduce processing load and avoid visual artifacts."));
 	}
 
 	// Hardware Fixes tab
