@@ -867,9 +867,9 @@ void VMManager::RequestDisplaySize(float scale /*= 0.0f*/)
 	{
 		case AspectRatioType::RAuto4_3_3_2:
 			if (GSgetDisplayMode() == GSVideoMode::SDTV_480P)
-				x_scale = (3.0f / 2.0f) / (static_cast<float>(iwidth) / static_cast<float>(iheight));
+				x_scale = (10.0f / 7.0f) / (static_cast<float>(iwidth) / static_cast<float>(iheight));
 			else
-				x_scale = (4.0f / 3.0f) / (static_cast<float>(iwidth) / static_cast<float>(iheight));
+				x_scale = (10.0f / 7.0f) / (static_cast<float>(iwidth) / static_cast<float>(iheight));
 			break;
 		case AspectRatioType::R4_3:
 			x_scale = (4.0f / 3.0f) / (static_cast<float>(iwidth) / static_cast<float>(iheight));
