@@ -291,9 +291,9 @@ static GSVector4 CalculateDrawDstRect(s32 window_width, s32 window_height, const
 	if (EmuConfig.CurrentAspectRatio == AspectRatioType::RAuto4_3_3_2)
 	{
 		if (is_progressive)
-			targetAr = 3.0f / 2.0f;
+			targetAr = 10.0f / 7.0f;
 		else
-			targetAr = 4.0f / 3.0f;
+			targetAr = 10.0f / 7.0f;
 	}
 	else if (EmuConfig.CurrentAspectRatio == AspectRatioType::R4_3)
 	{
