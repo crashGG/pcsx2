@@ -300,6 +300,7 @@ static GSVector4 CalculateDrawDstRect(s32 window_width, s32 window_height, const
 		targetAr = 4.0f / 3.0f;
 	}
 	else if (EmuConfig.CurrentAspectRatio == AspectRatioType::R16_9)
+	{
 		targetAr = 16.0f / 9.0f;
 	}
 	else if (EmuConfig.CurrentAspectRatio == AspectRatioType::R10_7)
