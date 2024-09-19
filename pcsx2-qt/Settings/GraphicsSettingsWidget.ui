@@ -140,9 +140,6 @@
            <string>Widescreen (16:9)</string>
           </property>
          </item>
-        </widget>
-       </item>
-       </item>
          <item>
           <property name="text">
            <string>Original Pixels (10:7)</string>
