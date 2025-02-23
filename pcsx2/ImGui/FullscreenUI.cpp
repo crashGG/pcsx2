@@ -3604,6 +3604,12 @@ void FullscreenUI::DrawGraphicsSettingsPage(SettingsInterface* bsi, bool show_ad
 		"11",
 		"12",
 	};
+	static constexpr const char* s_mipmapping_options[] = {
+		FSUI_NSTR("Disabled"),
+		FSUI_NSTR("Enabled"),
+		FSUI_NSTR("All Levels"),
+		FSUI_NSTR("Unclamped"),
+	};
 	static constexpr const char* s_bilinear_options[] = {
 		FSUI_NSTR("Nearest"),
 		FSUI_NSTR("Bilinear (Forced)"),
@@ -3737,6 +3743,9 @@ void FullscreenUI::DrawGraphicsSettingsPage(SettingsInterface* bsi, bool show_ad
 		DrawStringListSetting(bsi, FSUI_CSTR("Internal Resolution"),
 			FSUI_CSTR("Multiplies the render resolution by the specified factor (upscaling)."), "EmuCore/GS", "upscale_multiplier",
 			"1.000000", s_resolution_options, s_resolution_values, std::size(s_resolution_options), true);
+		DrawIntListSetting(
+			bsi, FSUI_CSTR("Mipmapping"), FSUI_CSTR("Enables emulation of the GS's texture mipmapping."), "EmuCore/GS", "hw_mipmap_mode",
+			static_cast<int>(GSHWMipmapMode::Enabled), s_mipmapping_options, std::size(s_mipmapping_options), true);
 		DrawIntListSetting(bsi, FSUI_CSTR("Bilinear Filtering"),
 			FSUI_CSTR("Selects where bilinear filtering is utilized when rendering textures."), "EmuCore/GS", "filter",
 			static_cast<int>(BiFiltering::PS2), s_bilinear_options, std::size(s_bilinear_options), true);
@@ -3751,8 +3760,6 @@ void FullscreenUI::DrawGraphicsSettingsPage(SettingsInterface* bsi, bool show_ad
 		DrawIntListSetting(bsi, FSUI_CSTR("Blending Accuracy"),
 			FSUI_CSTR("Determines the level of accuracy when emulating blend modes not supported by the host graphics API."), "EmuCore/GS",
 			"accurate_blending_unit", static_cast<int>(AccBlendLevel::Basic), s_blending_options, std::size(s_blending_options), true);
-		DrawToggleSetting(
-			bsi, FSUI_CSTR("Mipmapping"), FSUI_CSTR("Enables emulation of the GS's texture mipmapping."), "EmuCore/GS", "hw_mipmap", true);
 	}
 	else
 	{
