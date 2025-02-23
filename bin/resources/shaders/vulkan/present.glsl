@@ -59,7 +59,7 @@ vec4 ps_scanlines(uint i)
 			vec4(1, 1, 1, 0),
 			vec4(0, 0, 0, 0)};
 
-	return sample_c(v_tex) * clamp((mask[i] + 0.5f), 0.0f, 1.0f);
+	return sample_c(v_tex) * clamp((mask[i] + 0.82f), 0.0f, 1.0f);	// 扫描线暗度 0.0-1.0 最暗-无
 }
 
 #ifdef ps_copy
@@ -74,7 +74,7 @@ void ps_filter_scanlines() // scanlines
 {
 	uvec4 p = uvec4(gl_FragCoord);
 
-	o_col0 = ps_scanlines(p.y % 2);
+	o_col0 = ps_scanlines(p.y/2 % 2);	// y除以1-4 （扫描线间隔） % 2-4 （扫描线粗细） 以上设置适合4k, 搭配亮度+5，对比+1，色彩饱和+1 完美！
 }
 #endif
 

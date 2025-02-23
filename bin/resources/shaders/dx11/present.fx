@@ -89,7 +89,7 @@ float4 ps_scanlines(PS_INPUT input, int i)
 			float4(0, 0, 0, 0)
 		};
 
-	return sample_c(input.t) * saturate(mask[i] + 0.5f);
+	return sample_c(input.t) * saturate(mask[i] + 0.82f);	// 扫描线暗度 0.0-1.0 最暗-无
 }
 
 PS_OUTPUT ps_filter_scanlines(PS_INPUT input)
@@ -98,7 +98,7 @@ PS_OUTPUT ps_filter_scanlines(PS_INPUT input)
 
 	uint4 p = (uint4)input.p;
 
-	output.c = ps_scanlines(input, p.y % 2);
+	output.c = ps_scanlines(input, p.y/2 % 2);		// y除以1-4 （扫描线间隔） % 2-4 （扫描线粗细） 以上设置适合4k, 搭配亮度+5，对比+1，色彩饱和+1 完美！
 
 	return output;
 }
