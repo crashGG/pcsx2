@@ -293,10 +293,7 @@ void InterpVU0::Execute(u32 cycles)
 			case 2: // 180%
 				cycle_change /= 1.8f;
 				break;
-			case 3: // 200%
-				cycle_change /= 2.0f;
-				break;
-			case 4: // 300%
+			case 3: // 300%
 				cycle_change /= 3.0f;
 				break;
 			default:

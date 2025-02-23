@@ -102,11 +102,6 @@
         </item>
         <item>
          <property name="text">
-          <string>200% (Overclock)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
           <string>300% (Overclock)</string>
          </property>
         </item>
