@@ -3831,7 +3831,8 @@ void FullscreenUI::DrawGraphicsSettingsPage(SettingsInterface* bsi, bool show_ad
 				FSUI_NSTR("Normal (Vertex)"),
 				FSUI_NSTR("Special (Texture)"),
 				FSUI_NSTR("Special (Texture - Aggressive)"),
-				FSUI_NSTR("Align To Native"),
+				FSUI_NSTR("Align to Native"),
+				FSUI_NSTR("Align to Native - with Texture Offset"),
 			};
 			static constexpr const char* s_native_scaling_options[] = {
 				FSUI_NSTR("Normal (Default)"),
@@ -7582,7 +7583,8 @@ TRANSLATE_NOOP("FullscreenUI", "Merge Targets");
 TRANSLATE_NOOP("FullscreenUI", "Normal (Vertex)");
 TRANSLATE_NOOP("FullscreenUI", "Special (Texture)");
 TRANSLATE_NOOP("FullscreenUI", "Special (Texture - Aggressive)");
-TRANSLATE_NOOP("FullscreenUI", "Align To Native");
+TRANSLATE_NOOP("FullscreenUI", "Align to Native");
+TRANSLATE_NOOP("FullscreenUI", "Align to Native - with Texture Offset");
 TRANSLATE_NOOP("FullscreenUI", "Aggressive");
 TRANSLATE_NOOP("FullscreenUI", "Half");
 TRANSLATE_NOOP("FullscreenUI", "Force Bilinear");
