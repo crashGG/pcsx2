@@ -624,10 +624,10 @@ void VMManager::ReloadInputSources()
 		LoadInputBindings(*si, lock);
 }
 
-void VMManager::ReloadInputBindings()
+void VMManager::ReloadInputBindings(bool force)
 {
 	// skip loading bindings if we're not running, since it'll get done on startup anyway
-	if (!HasValidVM())
+	if (!force && !HasValidVM())
 		return;
 
 	FPControlRegisterBackup fpcr_backup(FPControlRegister::GetDefault());
@@ -662,19 +662,19 @@ void VMManager::LoadInputBindings(SettingsInterface& si, std::unique_lock<std::m
 		const bool use_profile_hotkeys = isi->GetBoolValue("Pad", "UseProfileHotkeyBindings", false);
 		if (use_profile_hotkeys)
 		{
-			InputManager::ReloadBindings(si, *isi, *isi);
+			InputManager::ReloadBindings(si, *isi, *isi, true, true);
 		}
 		else
 		{
 			// Temporarily disable the input profile layer, so it doesn't take precedence.
 			Host::Internal::SetInputSettingsLayer(nullptr, lock);
-			InputManager::ReloadBindings(si, *isi, si);
+			InputManager::ReloadBindings(si, *isi, si, true, false);
 			Host::Internal::SetInputSettingsLayer(s_input_settings_interface.get(), lock);
 		}
 	}
 	else
 	{
-		InputManager::ReloadBindings(si, si, si);
+		InputManager::ReloadBindings(si, si, si, false, false);
 	}
 }
 

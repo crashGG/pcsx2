@@ -63,7 +63,8 @@ union InputBindingKey
 		InputSubclass source_subtype : 3; ///< if 1, binding is for an axis and not a button (used for controllers)
 		InputModifier modifier : 2;
 		u32 invert : 1; ///< if 1, value is inverted prior to being sent to the sink
-		u32 unused : 14;
+		u32 needs_migration : 1; //< Used for SDL2-3 Migration, binding should be saved to complete migration
+		u32 unused : 13;
 		u32 data;
 	};
 
@@ -80,6 +81,7 @@ union InputBindingKey
 		r.bits = bits;
 		r.modifier = InputModifier::None;
 		r.invert = 0;
+		r.needs_migration = false;
 		return r;
 	}
 };
@@ -203,13 +205,13 @@ namespace InputManager
 	std::optional<InputBindingKey> ParseInputBindingKey(const std::string_view binding);
 
 	/// Converts a input key to a string.
-	std::string ConvertInputBindingKeyToString(InputBindingInfo::Type binding_type, InputBindingKey key);
+	std::string ConvertInputBindingKeyToString(InputBindingInfo::Type binding_type, InputBindingKey key, bool migration = false);
 
 	/// Converts a chord of binding keys to a string.
-	std::string ConvertInputBindingKeysToString(InputBindingInfo::Type binding_type, const InputBindingKey* keys, size_t num_keys);
+	std::string ConvertInputBindingKeysToString(InputBindingInfo::Type binding_type, const InputBindingKey* keys, size_t num_keys, bool migration = false);
 
 	/// Represents a binding with icon fonts, if available.
-	bool PrettifyInputBinding(SmallStringBase& binding);
+	bool PrettifyInputBinding(SmallStringBase& binding, bool use_icons = true);
 
 	/// Splits a chord into individual bindings.
 	std::vector<std::string_view> SplitChord(const std::string_view binding);
@@ -231,7 +233,7 @@ namespace InputManager
 	bool IsInputSourceEnabled(SettingsInterface& si, InputSourceType type);
 
 	/// Re-parses the config and registers all hotkey and pad bindings.
-	void ReloadBindings(SettingsInterface& si, SettingsInterface& binding_si, SettingsInterface& hotkey_binding_si);
+	void ReloadBindings(SettingsInterface& si, SettingsInterface& binding_si, SettingsInterface& hotkey_binding_si, bool is_binding_profile, bool is_hotkey_profile);
 
 	/// Re-parses the sources part of the config and initializes any backends.
 	void ReloadSources(SettingsInterface& si, std::unique_lock<std::mutex>& settings_lock);
