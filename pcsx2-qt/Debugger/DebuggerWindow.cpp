@@ -112,7 +112,9 @@ DebuggerWindow::DebuggerWindow(QWidget* parent)
 
 	QMenuBar* menu_bar = menuBar();
 
-	setMenuWidget(m_dock_manager->createLayoutSwitcher(menu_bar));
+	setMenuWidget(m_dock_manager->createMenuBar(menu_bar));
+
+	updateTheme();
 
 	Host::RunOnCPUThread([]() {
 		R5900SymbolImporter.OnDebuggerOpened();
@@ -193,7 +195,7 @@ void DebuggerWindow::setupFonts()
 		m_font_size++;
 
 		updateFontActions();
-		updateStyleSheets();
+		updateTheme();
 		saveFontSize();
 	});
 
@@ -205,7 +207,7 @@ void DebuggerWindow::setupFonts()
 		m_font_size--;
 
 		updateFontActions();
-		updateStyleSheets();
+		updateTheme();
 		saveFontSize();
 	});
 
@@ -213,12 +215,11 @@ void DebuggerWindow::setupFonts()
 		m_font_size = DEFAULT_FONT_SIZE;
 
 		updateFontActions();
-		updateStyleSheets();
+		updateTheme();
 		saveFontSize();
 	});
 
 	updateFontActions();
-	updateStyleSheets();
 }
 
 void DebuggerWindow::updateFontActions()
@@ -239,7 +240,7 @@ int DebuggerWindow::fontSize()
 	return m_font_size;
 }
 
-void DebuggerWindow::updateStyleSheets()
+void DebuggerWindow::updateTheme()
 {
 	// TODO: Migrate away from stylesheets to improve performance.
 	if (m_font_size != DEFAULT_FONT_SIZE)
@@ -252,7 +253,7 @@ void DebuggerWindow::updateStyleSheets()
 		setStyleSheet(QString());
 	}
 
-	dockManager().updateStyleSheets();
+	dockManager().updateTheme();
 }
 
 void DebuggerWindow::saveWindowGeometry()
@@ -306,12 +307,18 @@ void DebuggerWindow::onVMPaused()
 	m_ui.actionStepOver->setEnabled(true);
 	m_ui.actionStepOut->setEnabled(true);
 
-	// Switch to the CPU tab that triggered the breakpoint.
-	// Also blink the tab text to indicate that a breakpoint was triggered.
 	if (CBreakPoints::GetBreakpointTriggered())
 	{
-		const BreakPointCpu triggeredCpu = CBreakPoints::GetBreakpointTriggeredCpu();
-		m_dock_manager->switchToLayoutWithCPU(triggeredCpu, true);
+		// Select a layout tab corresponding to the CPU that triggered the
+		// breakpoint and make it start blinking unless said breakpoint was
+		// generated as a result of stepping.
+		const BreakPointCpu cpu_type = CBreakPoints::GetBreakpointTriggeredCpu();
+		if (cpu_type == BREAKPOINT_EE || cpu_type == BREAKPOINT_IOP)
+		{
+			DebugInterface& cpu = DebugInterface::get(cpu_type);
+			bool blink_tab = !CBreakPoints::IsSteppingBreakPoint(cpu_type, cpu.getPC());
+			m_dock_manager->switchToLayoutWithCPU(cpu_type, blink_tab);
+		}
 
 		Host::RunOnCPUThread([] {
 			CBreakPoints::ClearTemporaryBreakPoints();
@@ -417,7 +424,7 @@ void DebuggerWindow::onStepInto()
 		bpAddr = info.branchTarget; // Syscalls are always taken
 
 	Host::RunOnCPUThread([cpu, bpAddr] {
-		CBreakPoints::AddBreakPoint(cpu->getCpuType(), bpAddr, true);
+		CBreakPoints::AddBreakPoint(cpu->getCpuType(), bpAddr, true, true, true);
 		cpu->resumeCpu();
 	});
 
@@ -467,7 +474,7 @@ void DebuggerWindow::onStepOver()
 	}
 
 	Host::RunOnCPUThread([cpu, bpAddr] {
-		CBreakPoints::AddBreakPoint(cpu->getCpuType(), bpAddr, true);
+		CBreakPoints::AddBreakPoint(cpu->getCpuType(), bpAddr, true, true, true);
 		cpu->resumeCpu();
 	});
 
@@ -508,7 +515,7 @@ void DebuggerWindow::onStepOut()
 	u32 breakpoint_pc = stack_frames.at(1).pc;
 
 	Host::RunOnCPUThread([cpu, breakpoint_pc] {
-		CBreakPoints::AddBreakPoint(cpu->getCpuType(), breakpoint_pc, true);
+		CBreakPoints::AddBreakPoint(cpu->getCpuType(), breakpoint_pc, true, true, true);
 		cpu->resumeCpu();
 	});
 
