@@ -3173,6 +3173,11 @@ void VMManager::WarnAboutUnsafeSettings()
 			append(ICON_FA_IMAGES,
 				TRANSLATE_SV("VMManager", "Mipmapping is not set to Enabled/All Levels. This may break rendering in some games."));
 		}
+		if (EmuConfig.GS.UseDebugDevice)
+		{
+			append(ICON_FA_BUG,
+				TRANSLATE_SV("VMManager", "Debug device is enabled. This will massively reduce performance."));
+		}
 	}
 	if (EmuConfig.GS.TextureFiltering != BiFiltering::PS2)
 	{
