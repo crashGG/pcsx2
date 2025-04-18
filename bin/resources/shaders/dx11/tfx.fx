@@ -767,7 +767,7 @@ float4 ps_color(PS_INPUT input)
 	float4 T = sample_color(st, input.t.w);
 #endif
 
-	if (PS_SHUFFLE && !PS_SHUFFLE_SAME && !PS_READ16_SRC)
+	if (PS_SHUFFLE && !PS_SHUFFLE_SAME && !PS_READ16_SRC && !(PS_PROCESS_BA == SHUFFLE_READWRITE && PS_PROCESS_RG == SHUFFLE_READWRITE))
 	{
 		uint4 denorm_c_before = uint4(T);
 		if (PS_PROCESS_BA & SHUFFLE_READ)
@@ -852,6 +852,8 @@ void ps_color_clamp_wrap(inout float3 C)
 		else if (PS_COLCLIP == 1 || PS_HDR == 1)
 			C = (float3)((int3)C & (int3)0xFF);
 	}
+	else if (PS_DST_FMT == FMT_16 && PS_DITHER != 3 && PS_BLEND_MIX == 0 && PS_BLEND_HW == 0)
+		C = (float3)((int3)C & (int3)0xF8);
 }
 
 void ps_blend(inout float4 Color, inout float4 As_rgba, float2 pos_xy)
@@ -1084,7 +1086,7 @@ PS_OUTPUT ps_main(PS_INPUT input)
 
 	if (PS_SHUFFLE)
 	{
-		if (!PS_SHUFFLE_SAME && !PS_READ16_SRC)
+		if (!PS_SHUFFLE_SAME && !PS_READ16_SRC && !(PS_PROCESS_BA == SHUFFLE_READWRITE && PS_PROCESS_RG == SHUFFLE_READWRITE))
 		{
 			uint4 denorm_c_after = uint4(C);
 			if (PS_PROCESS_BA & SHUFFLE_READ)
@@ -1125,11 +1127,8 @@ PS_OUTPUT ps_main(PS_INPUT input)
 		{
 			if (PS_PROCESS_BA == SHUFFLE_READWRITE && PS_PROCESS_RG == SHUFFLE_READWRITE)
 			{
-				C.rb = C.br;
-				float g_temp = C.g;
-				
-				C.g = C.a;
-				C.a = g_temp;
+				C.br = C.rb;
+				C.ag = C.ga;
 			}
 			else if(PS_PROCESS_BA & SHUFFLE_READ)
 			{
