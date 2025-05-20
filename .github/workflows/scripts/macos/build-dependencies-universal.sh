@@ -11,7 +11,7 @@ merge_binaries() {
 "
 	pushd "$X86DIR"
 	for X86BIN in $(find . -type f \( -name '*.dylib' -o -name '*.a' -o -perm +111 \)); do
-		if file "$X86DIR/$X86BIN" | grep "Mach-O " >/dev/null; then
+		if file "$X86DIR/$X86BIN" | grep "Mach-O.*x86_64" >/dev/null; then
 			ARMBIN="${ARMDIR}/${X86BIN}"
 			echo "Merge $ARMBIN to $X86BIN..."
 			lipo -create "$X86BIN" "$ARMBIN" -o "$X86BIN"
@@ -39,11 +39,11 @@ if [ "${INSTALLDIR:0:1}" != "/" ]; then
 fi
 
 FREETYPE=2.13.3
-HARFBUZZ=10.0.1
-SDL=SDL3-3.2.10
+HARFBUZZ=11.2.0
+SDL=SDL3-3.2.14
 ZSTD=1.5.7
-LZ4=b8fd2d15309dd4e605070bd4486e26b6ef814e29
-LIBPNG=1.6.45
+LZ4=1.10.0
+LIBPNG=1.6.48
 LIBJPEGTURBO=3.1.0
 LIBWEBP=1.5.0
 FFMPEG=6.0
@@ -78,11 +78,11 @@ CMAKE_ARCH_UNIVERSAL=-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 
 cat > SHASUMS <<EOF
 0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289  freetype-$FREETYPE.tar.xz
-e7358ea86fe10fb9261931af6f010d4358dac64f7074420ca9bc94aae2bdd542  harfbuzz-$HARFBUZZ.tar.gz
-f87be7b4dec66db4098e9c167b2aa34e2ca10aeb5443bdde95ae03185ed513e0  $SDL.tar.gz
+16c0204704f3ebeed057aba100fe7db18d71035505cb10e595ea33d346457fc8  harfbuzz-$HARFBUZZ.tar.gz
+b7e7dc05011b88c69170fe18935487b2559276955e49113f8c1b6b72c9b79c1f  $SDL.tar.gz
 eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3  zstd-$ZSTD.tar.gz
-0728800155f3ed0a0c87e03addbd30ecbe374f7b080678bbca1506051d50dec3  $LZ4.tar.gz
-926485350139ffb51ef69760db35f78846c805fef3d59bfdcb2fba704663f370  libpng-$LIBPNG.tar.xz
+537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b  lz4-$LZ4.tar.gz
+46fd06ff37db1db64c0dc288d78a3f5efd23ad9ac41561193f983e20937ece03  libpng-$LIBPNG.tar.xz
 7d6fab70cf844bf6769077bd5d7a74893f8ffd4dfb42861745750c63c2a5c92c  libwebp-$LIBWEBP.tar.gz
 9564c72b1dfd1d6fe6274c5f95a8d989b59854575d4bbee44ade7bc17aa9bc93  libjpeg-turbo-$LIBJPEGTURBO.tar.gz
 57be87c22d9b49c112b6d24bc67d42508660e6b718b3db89c44e47e289137082  ffmpeg-$FFMPEG.tar.xz
@@ -106,17 +106,17 @@ curl -C - -L \
 	-o "harfbuzz-$HARFBUZZ.tar.gz" "https://github.com/harfbuzz/harfbuzz/archive/refs/tags/$HARFBUZZ.tar.gz" \
 	-O "https://libsdl.org/release/$SDL.tar.gz" \
 	-O "https://github.com/facebook/zstd/releases/download/v$ZSTD/zstd-$ZSTD.tar.gz" \
-	-O "https://github.com/lz4/lz4/archive/$LZ4.tar.gz" \
+	-O "https://github.com/lz4/lz4/releases/download/v$LZ4/lz4-$LZ4.tar.gz" \
 	-O "https://downloads.sourceforge.net/project/libpng/libpng16/$LIBPNG/libpng-$LIBPNG.tar.xz" \
 	-O "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/$LIBJPEGTURBO/libjpeg-turbo-$LIBJPEGTURBO.tar.gz" \
 	-O "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$LIBWEBP.tar.gz" \
 	-O "https://ffmpeg.org/releases/ffmpeg-$FFMPEG.tar.xz" \
 	-O "https://github.com/KhronosGroup/MoltenVK/archive/refs/tags/v$MOLTENVK.tar.gz" \
-	-O "https://download.qt.io/official_releases/qt/${QT%.*}/$QT/submodules/qtbase-everywhere-src-$QT.tar.xz" \
-	-O "https://download.qt.io/official_releases/qt/${QT%.*}/$QT/submodules/qtimageformats-everywhere-src-$QT.tar.xz" \
-	-O "https://download.qt.io/official_releases/qt/${QT%.*}/$QT/submodules/qtsvg-everywhere-src-$QT.tar.xz" \
-	-O "https://download.qt.io/official_releases/qt/${QT%.*}/$QT/submodules/qttools-everywhere-src-$QT.tar.xz" \
-	-O "https://download.qt.io/official_releases/qt/${QT%.*}/$QT/submodules/qttranslations-everywhere-src-$QT.tar.xz" \
+	-O "https://download.qt.io/archive/qt/${QT%.*}/$QT/submodules/qtbase-everywhere-src-$QT.tar.xz" \
+	-O "https://download.qt.io/archive/qt/${QT%.*}/$QT/submodules/qtimageformats-everywhere-src-$QT.tar.xz" \
+	-O "https://download.qt.io/archive/qt/${QT%.*}/$QT/submodules/qtsvg-everywhere-src-$QT.tar.xz" \
+	-O "https://download.qt.io/archive/qt/${QT%.*}/$QT/submodules/qttools-everywhere-src-$QT.tar.xz" \
+	-O "https://download.qt.io/archive/qt/${QT%.*}/$QT/submodules/qttranslations-everywhere-src-$QT.tar.xz" \
 	-o "shaderc-$SHADERC.tar.gz" "https://github.com/google/shaderc/archive/refs/tags/v$SHADERC.tar.gz" \
 	-o "shaderc-glslang-$SHADERC_GLSLANG.tar.gz" "https://github.com/KhronosGroup/glslang/archive/$SHADERC_GLSLANG.tar.gz" \
 	-o "shaderc-spirv-headers-$SHADERC_SPIRVHEADERS.tar.gz" "https://github.com/KhronosGroup/SPIRV-Headers/archive/$SHADERC_SPIRVHEADERS.tar.gz" \
@@ -187,7 +187,7 @@ cd ..
 
 echo "Installing LZ4..."
 rm -fr "lz4-$LZ4"
-tar xf "$LZ4.tar.gz"
+tar xf "lz4-$LZ4.tar.gz"
 cd "lz4-$LZ4"
 cmake "${CMAKE_COMMON[@]}" "$CMAKE_ARCH_X64" -DBUILD_SHARED_LIBS=ON -DLZ4_BUILD_CLI=OFF -DLZ4_BUILD_LEGACY_LZ4C=OFF -B build-dir build/cmake
 make -C build-dir "-j$NPROCS"
@@ -213,8 +213,11 @@ echo "Installing libjpegturbo..."
 rm -fr "libjpeg-turbo-$LIBJPEGTURBO"
 tar xf "libjpeg-turbo-$LIBJPEGTURBO.tar.gz"
 cd "libjpeg-turbo-$LIBJPEGTURBO"
-cmake "${CMAKE_COMMON[@]}" "$CMAKE_ARCH_ARM64" -DENABLE_STATIC=OFF -DENABLE_SHARED=ON -B build-arm64
+cmake "${CMAKE_COMMON[@]}" "$CMAKE_ARCH_X64" -DENABLE_STATIC=OFF -DENABLE_SHARED=ON -B build
 make -C build "-j$NPROCS"
+cmake "${CMAKE_COMMON[@]}" "$CMAKE_ARCH_ARM64" -DENABLE_STATIC=OFF -DENABLE_SHARED=ON -B build-arm64
+make -C build-arm64 "-j$NPROCS"
+merge_binaries $(realpath build) $(realpath build-arm64)
 make -C build install
 cd ..
 
@@ -380,7 +383,7 @@ echo "Building PlutoVG..."
 rm -fr "plutovg-$PLUTOVG"
 tar xf "plutovg-$PLUTOVG.tar.gz"
 cd "plutovg-$PLUTOVG"
-cmake "${CMAKE_COMMON[@]}" -DBUILD_SHARED_LIBS=ON -DPLUTOVG_BUILD_EXAMPLES=OFF -B build
+cmake "${CMAKE_COMMON[@]}" "$CMAKE_ARCH_UNIVERSAL" -DBUILD_SHARED_LIBS=ON -DPLUTOVG_BUILD_EXAMPLES=OFF -B build
 make -C build "-j$NPROCS"
 make -C build install
 cd ..
@@ -389,7 +392,7 @@ echo "Building PlutoSVG..."
 rm -fr "plutosvg-$PLUTOSVG"
 tar xf "plutosvg-$PLUTOSVG.tar.gz"
 cd "plutosvg-$PLUTOSVG"
-cmake "${CMAKE_COMMON[@]}" -DBUILD_SHARED_LIBS=ON -DPLUTOSVG_ENABLE_FREETYPE=ON -DPLUTOSVG_BUILD_EXAMPLES=OFF -B build
+cmake "${CMAKE_COMMON[@]}" "$CMAKE_ARCH_UNIVERSAL" -DBUILD_SHARED_LIBS=ON -DPLUTOSVG_ENABLE_FREETYPE=ON -DPLUTOSVG_BUILD_EXAMPLES=OFF -B build
 make -C build "-j$NPROCS"
 make -C build install
 cd ..
