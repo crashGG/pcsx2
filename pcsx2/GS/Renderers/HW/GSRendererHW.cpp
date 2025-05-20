@@ -2830,7 +2830,7 @@ void GSRendererHW::Draw()
 				hash_lod_range = GSVector2i(0, mxl);
 				TEX0 = m_cached_ctx.TEX0;
 			}
-			GL_CACHE("HW: Mipmap LOD %d %d (%f %f) new size %dx%d (K %d L %u)", m_lod.x, m_lod.y, m_vt.m_lod.x, m_vt.m_lod.y, 1 << TEX0.TW, 1 << TEX0.TH, m_context->TEX1.K, m_context->TEX1.L);
+			GL_CACHE("HW: Mipmap LOD %d %d (%f %f) new size %dx%d (K %d L %u)", m_lod.x, m_lod.y, m_vt.m_lod.x, m_vt.m_lod.y,
 				(1 << m_cached_ctx.TEX0.TW) >> m_lod.x, (1 << m_cached_ctx.TEX0.TH) >> m_lod.x, m_context->TEX1.K, m_context->TEX1.L);
 		}
 		else if (GSConfig.HWMipmapMode >= GSHWMipmapMode::AllLevels && m_context->TEX1.MXL > 0 && !m_context->TEX1.LCM)
