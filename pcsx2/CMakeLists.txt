@@ -753,7 +753,7 @@ if(DISABLE_ADVANCE_SIMD)
 		set(compile_options_sse4 -msse4.1)
 	else()
 		set(compile_options_avx2 -march=znver4 -mtune=znver4)
-		set(compile_options_avx  -march=sandybridge -mtune=sandybridge)
+		set(compile_options_avx  -march=znver4 -mtune=znver4)
 		set(compile_options_sse4 -msse4.1 -mtune=nehalem)
 	endif()
 	# ODR violation time!
