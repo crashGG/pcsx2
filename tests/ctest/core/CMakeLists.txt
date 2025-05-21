@@ -14,7 +14,7 @@ target_link_libraries(core_test PUBLIC
 
 if(DISABLE_ADVANCE_SIMD)
 	if(WIN32)
-		set(compile_options_avx2 /arch:AVX2)
+		set(compile_options_avx2 /arch:AVX512)
 		set(compile_options_avx  /arch:AVX)
 	elseif(USE_GCC)
 		# GCC can't inline into multi-isa functions if we use march and mtune, but can if we use feature flags
