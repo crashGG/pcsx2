@@ -621,9 +621,12 @@ void GSTextureCache::DirtyRectByPage(u32 sbp, u32 spsm, u32 sbw, Target* t, GSVe
 	if (!(src_info->bpp == dst_info->bpp))
 	{
 		const int src_bpp = src_info->bpp;
+		const bool column_align = !block_offset && src_r.z <= src_info->cs.x && src_r.w <= src_info->cs.y && src_info->depth == dst_info->depth;
 
 		if (block_offset)
 			in_rect = in_rect.ralign<Align_Outside>(src_info->bs);
+		else if (column_align)
+			in_rect = in_rect.ralign<Align_Outside>(src_info->cs);
 		else
 			in_rect = in_rect.ralign<Align_Outside>(src_info->pgs);
 
@@ -639,7 +642,10 @@ void GSTextureCache::DirtyRectByPage(u32 sbp, u32 spsm, u32 sbw, Target* t, GSVe
 
 		// Translate back to the new(dst) format.
 		in_rect = GSVector4i(in_pages.x * src_info->pgs.x, in_pages.y * src_info->pgs.y, in_pages.z * src_info->pgs.x, in_pages.w * src_info->pgs.y);
-		in_rect += GSVector4i(in_blocks.x * src_info->bs.x, in_blocks.y * src_info->bs.y, in_blocks.z * src_info->bs.x, in_blocks.w * src_info->bs.y);
+		if (column_align)
+			in_rect += GSVector4i(in_blocks.x * src_info->cs.x, in_blocks.y * src_info->cs.y, in_blocks.z * src_info->cs.x, in_blocks.w * src_info->cs.y);
+		else
+			in_rect += GSVector4i(in_blocks.x * src_info->bs.x, in_blocks.y * src_info->bs.y, in_blocks.z * src_info->bs.x, in_blocks.w * src_info->bs.y);
 
 		if (in_rect.rempty())
 			return;
@@ -1232,7 +1238,6 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 	}
 
 	Target* dst = nullptr;
-	bool half_right = false;
 	int x_offset = 0;
 	int y_offset = 0;
 
@@ -1437,7 +1442,7 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 
 					const u32 channel_mask = GSUtil::GetChannelMask(psm);
 					const u32 channels = t->m_dirty.GetDirtyChannels() & channel_mask;
-
+					const bool dirty_overlap = !t->m_dirty.GetTotalRect(t->m_TEX0, t->m_unscaled_size).rintersect(new_rect).rempty();
 					// If the source is reading the rt, make sure it's big enough.
 					if (!possible_shuffle && t && GSUtil::HasCompatibleBits(psm, t->m_TEX0.PSM)&& real_fmt_match)
 					{
@@ -1454,7 +1459,7 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 							ResizeTarget(t, resize_rect, bp, psm, bw);
 					}
 					// If not all channels are clean/dirty or only part of the rect is dirty, we need to update the target.
-					if (((channels & channel_mask) != channel_mask || partial))
+					if (dirty_overlap && ((channels & channel_mask) != channel_mask || partial))
 					{
 						t->Update();
 						rect_clean = true;
@@ -1589,14 +1594,14 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 					//	DevCon.Warning("Expected %x Got %x shuffle %d draw %d", psm, t_psm, possible_shuffle, GSState::s_n);
 					if (match)
 					{
-						// It is a complex to convert the code in shader. As a reference, let's do it on the CPU, it will be slow but
-						// 1/ it just works :)
-						// 2/ even with upscaling
-						// 3/ for both Direct3D and OpenGL
-						if (psm == PSMT4 || (GSConfig.UserHacks_CPUFBConversion && psm == PSMT8))
+						// It is a complex to convert the code in shader. As a reference, let's do it on the CPU,
+						// it will be slow but can work even with upscaling, also fine tune it so it's not enabled when not needed.
+						if (psm == PSMT4 || (GSConfig.UserHacks_CPUFBConversion && psm == PSMT8 && (!possible_shuffle || GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp != 32)) ||
+							(psm == PSMT8H && GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp == 16))
 						{
 							// Forces 4-bit and 8-bit frame buffer conversion to be done on the CPU instead of the GPU, but performance will be slower.
-							// There is no dedicated shader to handle 4-bit conversion (Stuntman has been confirmed to use 4-bit).
+							// There is no dedicated shader to handle 4-bit conversion (Beyond Good and Evil and Stuntman).
+							// Note: Stuntman no longer hits the PSMT4 code path.
 							// Direct3D10/11 and OpenGL support 8-bit fb conversion but don't render some corner cases properly (Harry Potter games).
 							// The hack can fix glitches in some games.
 							if (!t->m_drawn_since_read.rempty())
@@ -1638,22 +1643,6 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 							}
 						}
 					}
-				}
-				else if ((t->m_TEX0.TBW >= 16) && GSUtil::HasSharedBits(bp, psm, t->m_TEX0.TBP0 + t->m_TEX0.TBW * 0x10, t->m_TEX0.PSM))
-				{
-					// Detect half of the render target (fix snow engine game)
-					// Target Page (8KB) have always a width of 64 pixels
-					// Half of the Target is TBW/2 pages * 8KB / (1 block * 256B) = 0x10
-					if (!t->HasValidBitsForFormat(psm, req_color, req_alpha, t->m_TEX0.TBW == TEX0.TBW) && !(possible_shuffle && GSLocalMemory::m_psm[psm].bpp == 16 && GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp == 32))
-						continue;
-
-					half_right = true;
-					dst = t;
-					found_t = true;
-					tex_merge_rt = false;
-					x_offset = 0;
-					y_offset = 0;
-					break;
 				}
 				// Make sure the texture actually is INSIDE the RT, it's possibly not valid if it isn't.
 				// Also check BP >= TBP, create source isn't equpped to expand it backwards and all data comes from the target. (GH3)
@@ -2003,9 +1992,8 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 #ifdef ENABLE_OGL_DEBUG
 		if (dst)
 		{
-			GL_CACHE("TC: dst %s hit (%s, OFF <%d,%d>): (0x%x, %s)",
+			GL_CACHE("TC: dst %s hit (OFF <%d,%d>): (0x%x, %s)",
 				to_string(dst->m_type),
-				half_right ? "half" : "full",
 				x_offset,
 				y_offset,
 				TEX0.TBP0,
@@ -2017,7 +2005,7 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 		}
 #endif
 
-		src = CreateSource(TEX0, TEXA, dst, half_right, x_offset, y_offset, lod, &r, gpu_clut, region);
+		src = CreateSource(TEX0, TEXA, dst, x_offset, y_offset, lod, &r, gpu_clut, region);
 		if (!src) [[unlikely]]
 			return nullptr;
 	}
@@ -3938,24 +3926,30 @@ void GSTextureCache::InvalidateContainedTargets(u32 start_bp, u32 end_bp, u32 wr
 				continue;
 			}
 
-			const u32 offset = (std::abs(static_cast<int>(start_bp - t->m_TEX0.TBP0)) >> 5) % std::max(1U, t->m_TEX0.TBW);
 			// If not fully contained but they are aligned and or clean, just dirty the area.
-			if (type != DepthStencil && start_bp != t->m_TEX0.TBP0 && (t->m_TEX0.TBP0 < start_bp || t->UnwrappedEndBlock() > end_bp) && (offset == 0 || t->m_dirty.size() == 0))
+			if (type != DepthStencil && start_bp != t->m_TEX0.TBP0 && (t->m_TEX0.TBP0 < start_bp || t->UnwrappedEndBlock() > end_bp))
 			{
-				if (write_bw == t->m_TEX0.TBW && GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[write_psm].bpp)
-				{
-					const u32 page_offset = ((end_bp - start_bp) >> 5);
-					const u32 end_width = write_bw * 64;
-					const u32 end_height = ((page_offset / std::max(write_bw, 1U)) * GSLocalMemory::m_psm[write_psm].pgs.y) + GSLocalMemory::m_psm[write_psm].pgs.y;
-					const GSVector4i r = GSVector4i(0, 0, end_width, end_height);
-					const GSVector4i invalidate_r = TranslateAlignedRectByPage(t, start_bp, write_psm, write_bw, r, false).rintersect(t->m_valid); // it is invalidation but we need a real rect.
-					RGBAMask mask;
-					mask._u32 = GSUtil::GetChannelMask(write_psm);
-					AddDirtyRectTarget(t, invalidate_r, t->m_TEX0.PSM, t->m_TEX0.TBW, mask, false);
-				}
+				const u32 offset = (std::abs(static_cast<int>(start_bp - t->m_TEX0.TBP0)) >> 5) % std::max(1U, t->m_TEX0.TBW);
+				const GSVector4i dirty_rect = t->m_dirty.GetTotalRect(t->m_TEX0, t->m_unscaled_size).rintersect(t->m_valid);
+				const u32 end_page_offset = ((end_bp - start_bp) >> 5);
+				const u32 end_width = write_bw * 64;
+				const u32 end_height = ((end_page_offset / std::max(write_bw, 1U)) * GSLocalMemory::m_psm[write_psm].pgs.y) + GSLocalMemory::m_psm[write_psm].pgs.y;
+				const GSVector4i r = GSVector4i(0, 0, end_width, end_height);
+				const GSVector4i invalidate_r = TranslateAlignedRectByPage(t, start_bp, write_psm, write_bw, r, false).rintersect(t->m_valid); // it is invalidation but we need a real rect.
 
-				++i;
-				continue;
+				if (offset == 0 || dirty_rect.rempty() || !dirty_rect.rintersect(invalidate_r).rempty())
+				{
+					if (write_bw == t->m_TEX0.TBW && GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[write_psm].bpp)
+					{
+						
+						RGBAMask mask;
+						mask._u32 = GSUtil::GetChannelMask(write_psm);
+						AddDirtyRectTarget(t, invalidate_r, t->m_TEX0.PSM, t->m_TEX0.TBW, mask, false);
+					}
+
+					++i;
+					continue;
+				}
 			}
 
 			InvalidateSourcesFromTarget(t);
@@ -5360,7 +5354,7 @@ void GSTextureCache::IncAge()
 }
 
 //Fixme: Several issues in here. Not handling depth stencil, pitch conversion doesnt work.
-GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, Target* dst, bool half_right, int x_offset, int y_offset, const GSVector2i* lod, const GSVector4i* src_range, GSTexture* gpu_clut, SourceRegion region)
+GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, Target* dst, int x_offset, int y_offset, const GSVector2i* lod, const GSVector4i* src_range, GSTexture* gpu_clut, SourceRegion region)
 {
 	const GSLocalMemory::psm_t& psm = GSLocalMemory::m_psm[TEX0.PSM];
 	Source* src = new Source(TEX0, TEXA);
@@ -5400,7 +5394,10 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 		const int w = static_cast<int>(std::ceil(scale * tw));
 		const int h = static_cast<int>(std::ceil(scale * th));
 
-		dst->Update();
+		const GSVector4i read_rect = GSVector4i(x_offset, y_offset, x_offset + tw, y_offset + th);
+		// Do this first as we could be adding in alpha from an upgraded 24bit target. if the rect intersects a dirty area.
+		if (!dst->m_dirty.empty() && !read_rect.rintersect(dst->m_dirty.GetTotalRect(dst->m_TEX0, dst->m_unscaled_size)).rempty())
+			dst->Update();
 
 		// If we have a source larger than the target (from tex-in-rt), texelFetch() for target region will return black.
 		if constexpr (force_target_copy)
@@ -5679,34 +5676,11 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 		const bool use_texture = (shader == ShaderConvert::COPY && !source_rect_empty);
 		GSVector4i region_rect = GSVector4i(0, 0, tw, th);
 
-		if (half_right)
-		{
-			// You typically hit this code in snow engine game. Dstsize is the size of of Dx/GL RT
-			// which is set to some arbitrary number. h/w are based on the input texture
-			// so the only reliable way to find the real size of the target is to use the TBW value.
-			const int half_width = static_cast<int>(dst->m_TEX0.TBW * (64 / 2));
-			if (half_width < dst->m_unscaled_size.x)
-			{
-				const int copy_width = std::min(half_width, dst->m_unscaled_size.x - half_width);
-				region_rect = GSVector4i(half_width, 0, half_width + copy_width, th);
-				GL_CACHE("TC: Half right fix: %d,%d => %d,%d", region_rect.x, region_rect.y, region_rect.z, region_rect.w);
-
-				sRect = sRect.blend32<5>(GSVector4i(GSVector4(region_rect.rintersect(dst->GetUnscaledRect())) * GSVector4(dst->m_scale)));
-				new_size.x = sRect.width();
-				src->m_unscaled_size.x = copy_width;
-			}
-			else
-			{
-				DevCon.Error("TC: Invalid half-right copy with width %d from %dx%d texture", half_width * 2, dst->m_unscaled_size.x, dst->m_unscaled_size.y);
-			}
-		}
-
 		// Assuming everything matches up, instead of copying the target, we can just sample it directly.
 		// It's the same as doing the copy first, except we save GPU time.
 		// TODO: We still need to copy if the TBW is mismatched. Except when TBW <= 1 (Jak 2).
 		const GSVector2i dst_texture_size = dst->m_texture->GetSize();
-		if ((!half_right || region_rect.z >= dst->m_unscaled_size.x) && // not a smaller subsample
-			use_texture && // not reinterpreting the RT
+		if (use_texture && // not reinterpreting the RT
 			!force_target_copy)
 		{
 			// sample the target directly

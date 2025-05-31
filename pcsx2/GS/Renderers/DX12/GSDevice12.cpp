@@ -3849,7 +3849,7 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 			colclip_rt->TransitionToState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 			draw_rt = static_cast<GSTexture12*>(config.rt);
-			OMSetRenderTargets(draw_rt, draw_ds, config.scissor);
+			OMSetRenderTargets(draw_rt, draw_ds, config.colclip_update_area);
 
 			// if this target was cleared and never drawn to, perform the clear as part of the resolve here.
 			BeginRenderPass(GetLoadOpForTexture(draw_rt), D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE,
@@ -3917,7 +3917,7 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 		{
 			EndRenderPass();
 
-			GL_PUSH("Copy RT to temp texture {%d,%d %dx%d}", config.drawarea.left, config.drawarea.top,
+			GL_PUSH("D3D12: Copy RT to temp texture {%d,%d %dx%d}", config.drawarea.left, config.drawarea.top,
 				config.drawarea.width(), config.drawarea.height());
 
 			draw_rt_clone->SetState(GSTexture::State::Invalidated);
@@ -3927,6 +3927,8 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 			if (config.tex && config.tex == config.rt)
 				PSSetShaderResource(0, draw_rt_clone, true);
 		}
+		else
+			Console.Warning("D3D12: Failed to allocate temp texture for RT copy.");
 	}
 
 	if (config.tex && config.tex == config.ds)
@@ -3937,13 +3939,15 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 		{
 			EndRenderPass();
 
-			GL_PUSH("Copy RT to temp texture {%d,%d %dx%d}", config.drawarea.left, config.drawarea.top,
+			GL_PUSH("D3D12: Copy DS to temp texture {%d,%d %dx%d}", config.drawarea.left, config.drawarea.top,
 				config.drawarea.width(), config.drawarea.height());
 
 			draw_ds_clone->SetState(GSTexture::State::Invalidated);
 			CopyRect(config.ds, draw_ds_clone, config.drawarea, config.drawarea.left, config.drawarea.top);
 			PSSetShaderResource(0, draw_ds_clone, true);
 		}
+		else
+			Console.Warning("D3D12: Failed to allocate temp texture for DS copy.");
 	}
 
 	// Switch to colclip target for colclip hw rendering
@@ -3958,7 +3962,7 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 			colclip_rt = static_cast<GSTexture12*>(CreateRenderTarget(rtsize.x, rtsize.y, GSTexture::Format::ColorClip, false));
 			if (!colclip_rt)
 			{
-				Console.WriteLn("D3D12: Failed to allocate ColorClip render target, aborting draw.");
+				Console.Warning("D3D12: Failed to allocate ColorClip render target, aborting draw.");
 
 				if (date_image)
 					Recycle(date_image);
@@ -4038,6 +4042,7 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 	// rt -> colclip hw blit if enabled
 	if (colclip_rt && (config.colclip_mode == GSHWDrawConfig::ColClipMode::ConvertOnly || config.colclip_mode == GSHWDrawConfig::ColClipMode::ConvertAndResolve) && config.rt->GetState() == GSTexture::State::Dirty)
 	{
+		OMSetRenderTargets(draw_rt, draw_ds, GSVector4i::loadh(rtsize));
 		SetUtilityTexture(static_cast<GSTexture12*>(config.rt), m_point_sampler_cpu);
 		SetPipeline(m_colclip_setup_pipelines[pipe.ds].get());
 
@@ -4047,8 +4052,10 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 		g_perfmon.Put(GSPerfMon::TextureCopies, 1);
 
 		GL_POP();
-	}
 
+		// Restore original scissor, not sure if needed since the render pass has already been started. But to be safe.
+		OMSetRenderTargets(draw_rt, draw_ds, config.scissor);
+	}
 	// VB/IB upload, if we did DATE setup and it's not colclip hw this has already been done
 	SetPrimitiveTopology(s_primitive_topology_mapping[static_cast<u8>(config.topology)]);
 	if (!date_image || colclip_rt)
@@ -4111,7 +4118,7 @@ void GSDevice12::RenderHW(GSHWDrawConfig& config)
 			colclip_rt->TransitionToState(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 			draw_rt = static_cast<GSTexture12*>(config.rt);
-			OMSetRenderTargets(draw_rt, draw_ds, config.scissor);
+			OMSetRenderTargets(draw_rt, draw_ds, config.colclip_update_area);
 
 			// if this target was cleared and never drawn to, perform the clear as part of the resolve here.
 			BeginRenderPass(GetLoadOpForTexture(draw_rt), D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE,
