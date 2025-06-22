@@ -2557,8 +2557,6 @@ SCAJ-25012:
 SCAJ-25026:
   name: "Kunoichi Shinobi"
   region: "NTSC-Unk"
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SCAJ-25034:
   name: "Sakura Taisen Monogatari"
   region: "NTSC-Unk"
@@ -12878,8 +12876,6 @@ SLAJ-25023:
 SLAJ-25026:
   name: "Kunoichi Shinobi"
   region: "NTSC-Unk"
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SLAJ-25027:
   name: "Sonic Heroes"
   region: "NTSC-Unk"
@@ -12894,8 +12890,6 @@ SLAJ-25030:
 SLAJ-25031:
   name: "Kunoichi - Shinobu"
   region: "NTSC-C-J"
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SLAJ-25033:
   name: "Puyo Puyo Fever"
   region: "NTSC-Unk"
@@ -12927,7 +12921,7 @@ SLAJ-25041:
   name: "Harry Potter and the Prisoner of Azkaban"
   region: "NTSC-C"
   gsHWFixes:
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Aligns mirror reflections, removes some bloom-related ghosting.
     recommendedBlendingLevel: 4 # Improves lighting effects.
 SLAJ-25042:
@@ -16829,7 +16823,7 @@ SLES-51192:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51193:
@@ -16839,7 +16833,7 @@ SLES-51193:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51194:
@@ -16849,7 +16843,7 @@ SLES-51194:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51195:
@@ -16859,7 +16853,7 @@ SLES-51195:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51196:
@@ -16869,7 +16863,7 @@ SLES-51196:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51197:
@@ -16926,7 +16920,7 @@ SLES-51214:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51215:
@@ -16936,7 +16930,7 @@ SLES-51215:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51216:
@@ -16946,7 +16940,7 @@ SLES-51216:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51217:
@@ -16956,7 +16950,7 @@ SLES-51217:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51218:
@@ -16966,7 +16960,7 @@ SLES-51218:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51219:
@@ -16976,7 +16970,7 @@ SLES-51219:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
     texturePreloading: 0 # Performs better on certain areas like mid-game in and around the castle as the hash goes easily to 200 MB.
 SLES-51220:
@@ -19388,8 +19382,6 @@ SLES-52238:
   name: "Nightshade"
   region: "PAL-M5"
   compat: 5
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SLES-52240:
   name: "International Pool Championship"
   region: "PAL-M5"
@@ -19896,7 +19888,7 @@ SLES-52440:
   region: "PAL-M7"
   compat: 3
   gsHWFixes:
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Aligns mirror reflections, removes some bloom-related ghosting.
     recommendedBlendingLevel: 4 # Improves lighting effects.
 SLES-52444:
@@ -20123,7 +20115,7 @@ SLES-52527:
   name: "Harry Potter og Fangen fra Azkaban"
   region: "PAL-M4"
   gsHWFixes:
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Aligns mirror reflections, removes some bloom-related ghosting.
     recommendedBlendingLevel: 4 # Improves lighting effects.
 SLES-52531:
@@ -20434,7 +20426,7 @@ SLES-52600:
   name: "Harry Potter and the Prisoner of Azkaban"
   region: "PAL-PL"
   gsHWFixes:
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Aligns mirror reflections, removes some bloom-related ghosting.
     recommendedBlendingLevel: 4 # Improves lighting effects.
 SLES-52601:
@@ -22086,6 +22078,8 @@ SLES-53099:
 SLES-53100:
   name: "Scooby-Doo! Unmasked"
   region: "PAL-M4"
+  gsHWFixes:
+    nativeScaling: 2 # Fixes post processing position.
 SLES-53104:
   name: "Tom Clancy's Rainbow Six - Lockdown"
   region: "PAL-M5"
@@ -30956,8 +30950,6 @@ SLKA-25135:
   name: "Kunoichi"
   region: "NTSC-K"
   compat: 5
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SLKA-25136:
   name: "Need for Speed - Underground"
   region: "NTSC-K"
@@ -31108,7 +31100,7 @@ SLKA-25172:
   name: "Harry Potter and the Prisoner of Azkaban"
   region: "NTSC-K"
   gsHWFixes:
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Aligns mirror reflections, removes some bloom-related ghosting.
     recommendedBlendingLevel: 4 # Improves lighting effects.
 SLKA-25173:
@@ -32522,8 +32514,6 @@ SLKA-35004:
   name: "Sakura Wars 5 So Long My Love"
   region: "NTSC-K"
   compat: 5
-  gsHWFixes:
-    getSkipCount: "GSC_SakuraWarsSoLongMyLove"
 SLKA-35005:
   name: "Jin Samguk Mussang 5 - Special"
   region: "NTSC-K"
@@ -35217,8 +35207,6 @@ SLPM-61059:
   name-sort: "くのいち -しのび- [たいけんばん]"
   name-en: "Kunoichi -Shinobi- [Trial]"
   region: "NTSC-J"
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SLPM-61060:
   name: "BUSIN 0 ～Wizardry Alternative NEO～ [体験版]"
   name-sort: "ぶしん ぜろ ～うぃざーどりぃ おるたなてぃぶ ねお～ [たいけんばん]"
@@ -36957,7 +36945,7 @@ SLPM-62241:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
 SLPM-62242:
   name: "撞球 ビリヤードマスター2"
@@ -38369,7 +38357,7 @@ SLPM-62513:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
 SLPM-62514:
   name: "シムピープル ～お茶の間劇場～ [EA BEST HITS]"
@@ -39800,7 +39788,7 @@ SLPM-64528:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
 SLPM-64532:
   name: "Digital Holmes"
@@ -42473,8 +42461,6 @@ SLPM-65447:
   name-en: "Kunoichi -Shinobi-"
   region: "NTSC-J"
   compat: 5
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SLPM-65448:
   name: "カンブリアンQTS ～化石になっても～"
   name-sort: "かんぶりあんQTS ～かせきになっても～"
@@ -43355,7 +43341,7 @@ SLPM-65612:
   name-en: "Harry Potter and the Prisoner of Azkaban"
   region: "NTSC-J"
   gsHWFixes:
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Aligns mirror reflections, removes some bloom-related ghosting.
     recommendedBlendingLevel: 4 # Improves lighting effects.
 SLPM-65613:
@@ -52157,7 +52143,7 @@ SLPM-68005:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
 SLPM-68007:
   name: "カラオケレボリューション用マイク同梱お試しディスク"
@@ -54308,7 +54294,7 @@ SLPS-20234:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
 SLPS-20237:
   name: "Saikyou Toudai Shougi 3"
@@ -59136,6 +59122,8 @@ SLPS-25581:
   name-sort: "しんぷる2000しりーず Vol.  92 THE のろいのげーむ"
   name-en: "Simple 2000 Series Vol. 92 - The Game of a Curse"
   region: "NTSC-J"
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes corrupted and missing graphics.
 SLPS-25582:
   name: "アストロ球団 決戦！！ビクトリー球団編"
   name-sort: "あすとろきゅうだん けっせん！！びくとりーきゅうだんへん"
@@ -65273,7 +65261,7 @@ SLUS-20576:
     - EETimingHack # Fixes flickering textures.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes missing lighting effects.
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
 SLUS-20577:
   name: "Drome Racers"
@@ -66538,8 +66526,6 @@ SLUS-20810:
   name: "Nightshade"
   region: "NTSC-U"
   compat: 5
-  gsHWFixes:
-    getSkipCount: "GSC_Kunoichi"
 SLUS-20811:
   name: "Need for Speed - Underground"
   region: "NTSC-U"
@@ -67218,7 +67204,7 @@ SLUS-20926:
   name: "Harry Potter and the Prisoner of Azkaban"
   region: "NTSC-U"
   gsHWFixes:
-    cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+    textureInsideRT: 1 # Fixes right side shadow lookup.
     halfPixelOffset: 2 # Aligns mirror reflections, removes some bloom-related ghosting.
     recommendedBlendingLevel: 4 # Improves lighting effects.
 SLUS-20927:
@@ -68231,6 +68217,8 @@ SLUS-21091:
   name: "Scooby-Doo! Unmasked"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    nativeScaling: 2 # Fixes post processing position.
 SLUS-21093:
   name: "Worms Forts - Under Siege"
   region: "NTSC-U"
@@ -73133,8 +73121,6 @@ SLUS-21927:
   name: "Sakura Wars - So Long, My Love [English - Disc 1]"
   region: "NTSC-U"
   compat: 5
-  gsHWFixes:
-    getSkipCount: "GSC_SakuraWarsSoLongMyLove"
 SLUS-21928:
   name: "Scooby-Doo! and the Spooky Swamp"
   region: "NTSC-U"
@@ -73151,8 +73137,6 @@ SLUS-21930:
   name: "Sakura Wars - So Long, My Love [Japanese - Disc 2]"
   region: "NTSC-U"
   compat: 5
-  gsHWFixes:
-    getSkipCount: "GSC_SakuraWarsSoLongMyLove"
 SLUS-21931:
   name: "Disney/Pixar Toy Story 3"
   region: "NTSC-U"
