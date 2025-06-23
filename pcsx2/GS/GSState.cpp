@@ -575,7 +575,7 @@ void GSState::GIFPackedRegHandlerSTQ(const GIFPackedReg* RESTRICT r)
 
 	// Vexx (character shadow)
 	// q = 0 (st also 0 on the first 16 vertices), setting it to 1.0f to avoid div by zero later
-	q = q.blend8(GSVector4i::cast(GSVector4::m_one), q == GSVector4i::zero());
+	q = q.blend8(GSVector4i::cast(GSVector4(FLT_MIN)), q == GSVector4i::zero());
 
 	// Suikoden 4
 	// creates some nan for Q. Let's avoid undefined behavior (See GIFRegHandlerRGBAQ)
@@ -671,7 +671,7 @@ void GSState::GIFPackedRegHandlerSTQRGBAXYZF2(const GIFPackedReg* RESTRICT r, u3
 		GSVector4i q = GSVector4i::loadl(&r[0].U64[1]);
 		const GSVector4i rgba = (GSVector4i::load<false>(&r[1]) & GSVector4i::x000000ff()).ps32().pu16();
 
-		q = q.blend8(GSVector4i::cast(GSVector4::m_one), q == GSVector4i::zero()); // see GIFPackedRegHandlerSTQ
+		q = q.blend8(GSVector4i::cast(GSVector4(FLT_MIN)), q == GSVector4i::zero()); // see GIFPackedRegHandlerSTQ
 
 		m_v.m[0] = st.upl64(rgba.upl32(q)); // TODO: only store the last one
 
@@ -705,7 +705,7 @@ void GSState::GIFPackedRegHandlerSTQRGBAXYZ2(const GIFPackedReg* RESTRICT r, u32
 		GSVector4i q = GSVector4i::loadl(&r[0].U64[1]);
 		const GSVector4i rgba = (GSVector4i::load<false>(&r[1]) & GSVector4i::x000000ff()).ps32().pu16();
 
-		q = q.blend8(GSVector4i::cast(GSVector4::m_one), q == GSVector4i::zero()); // see GIFPackedRegHandlerSTQ
+		q = q.blend8(GSVector4i::cast(GSVector4(FLT_MIN)), q == GSVector4i::zero()); // see GIFPackedRegHandlerSTQ
 
 		m_v.m[0] = st.upl64(rgba.upl32(q)); // TODO: only store the last one
 
@@ -4237,7 +4237,10 @@ void GSState::CalcAlphaMinMax(const int tex_alpha_min, const int tex_alpha_max)
 
 	if (IsCoverageAlpha())
 	{
-		min = 128;
+		// HW renderer doesn't currently support AA, so its min is 128.
+		// If we add AA support to the HW renderer, this will need to be changed.
+		// (Will probably only be supported with ROV/FBFetch so we would want to check for that.)
+		min = GSIsHardwareRenderer() ? 128 : 0;
 		max = 128;
 	}
 	else

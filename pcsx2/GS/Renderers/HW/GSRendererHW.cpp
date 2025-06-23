@@ -8210,7 +8210,7 @@ bool GSRendererHW::CanUseSwPrimRender(bool no_rt, bool no_ds, bool draw_sprite_t
 
 					if (start_bp < dirty_end_bp && end_bp > dirty_start_bp)
 					{
-						if (dirty_start_bp > start_bp || dirty_end_bp < end_bp)
+						if (dirty_start_bp <= start_bp && dirty_end_bp >= end_bp)
 						{
 							return true;
 						}
