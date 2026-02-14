@@ -158,7 +158,7 @@ fragment float4 ps_filter_transparency(ConvertShaderData data [[stage_in]], Conv
 
 fragment uint ps_convert_float32_32bits(ConvertShaderData data [[stage_in]], ConvertPSDepthRes res)
 {
-	return uint(0x1p32 * res.sample(data.t));
+	return uint(min(0x1p32 * res.sample(data.t), 4294967280.0f));
 }
 
 fragment float4 ps_convert_float32_rgba8(ConvertShaderData data [[stage_in]], ConvertPSDepthRes res)
@@ -252,7 +252,7 @@ struct ConvertToDepthRes
 fragment DepthOut ps_convert_float32_float24(ConvertShaderData data [[stage_in]], ConvertPSDepthRes res)
 {
 	// Truncates depth value to 24bits
-	uint val = uint(res.sample(data.t) * 0x1p32) & 0xFFFFFF;
+	uint val = uint(min(res.sample(data.t) * 0x1p32, 4294967280.0f)) & 0xFFFFFF;
 	return float(val) * 0x1p-32f;
 }
 

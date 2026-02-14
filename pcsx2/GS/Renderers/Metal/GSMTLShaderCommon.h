@@ -39,13 +39,13 @@ struct ConvertPSDepthRes
 
 static inline float4 convert_depth32_rgba8(float value)
 {
-	uint val = uint(value * 0x1p32);
+	uint val = uint(min(value * 0x1p32, 4294967280.0f));
 	return float4(as_type<uchar4>(val));
 }
 
 static inline float4 convert_depth16_rgba8(float value)
 {
-	uint val = uint(value * 0x1p32);
+	uint val = uint(min(value * 0x1p32, 4294967280.0f));
 	return float4(uint4(val << 3, val >> 2, val >> 7, val >> 8) & uint4(0xf8, 0xf8, 0xf8, 0x80));
 }
 

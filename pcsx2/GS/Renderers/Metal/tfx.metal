@@ -509,7 +509,7 @@ struct PSMain
 
 	uint fetch_raw_depth()
 	{
-		return tex_depth.read(ushort2(in.p.xy + cb.channel_shuffle_offset)) * 0x1p32f;
+		return uint(min(tex_depth.read(ushort2(in.p.xy + cb.channel_shuffle_offset)) * 0x1p32f, 4294967280.0f));
 	}
 
 	float4 fetch_raw_color()

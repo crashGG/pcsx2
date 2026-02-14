@@ -166,7 +166,7 @@ PS_OUTPUT ps_colclip_resolve(PS_INPUT input)
 uint ps_convert_float32_32bits(PS_INPUT input) : SV_Target0
 {
 	// Convert a FLOAT32 depth texture into a 32 bits UINT texture
-	return uint(exp2(32.0f) * sample_c(input.t).r);
+	return uint(min(exp2(32.0f) * sample_c(input.t).r, 4294967280.0f));
 }
 
 PS_OUTPUT ps_convert_float32_rgba8(PS_INPUT input)
@@ -174,7 +174,7 @@ PS_OUTPUT ps_convert_float32_rgba8(PS_INPUT input)
 	PS_OUTPUT output;
 
 	// Convert a FLOAT32 depth texture into a RGBA color texture
-	uint d = uint(sample_c(input.t).r * exp2(32.0f));
+	uint d = uint(min(sample_c(input.t).r * exp2(32.0f), 4294967280.0f));
 	output.c = float4(uint4((d & 0xFFu), ((d >> 8) & 0xFFu), ((d >> 16) & 0xFFu), (d >> 24))) / 255.0f;
 
 	return output;
@@ -185,7 +185,7 @@ PS_OUTPUT ps_convert_float16_rgb5a1(PS_INPUT input)
 	PS_OUTPUT output;
 
 	// Convert a FLOAT32 (only 16 lsb) depth into a RGB5A1 color texture
-	uint d = uint(sample_c(input.t).r * exp2(32.0f));
+	uint d = uint(min(sample_c(input.t).r * exp2(32.0f), 4294967280.0f));
 	output.c = float4(uint4(d << 3, d >> 2, d >> 7, d >> 8) & uint4(0xf8, 0xf8, 0xf8, 0x80)) / 255.0f;
 	return output;
 }
@@ -217,7 +217,7 @@ float rgb5a1_to_depth16(float4 val)
 float ps_convert_float32_float24(PS_INPUT input) : SV_Depth
 {
 	// Truncates depth value to 24bits
-	uint d = uint(sample_c(input.t).r * exp2(32.0f)) & 0xFFFFFFu;
+	uint d = uint(min(sample_c(input.t).r * exp2(32.0f), 4294967280.0f)) & 0xFFFFFFu;
 	return float(d) * exp2(-32.0f);
 }
 
