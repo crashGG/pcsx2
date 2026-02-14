@@ -563,7 +563,7 @@ int fetch_raw_depth(ivec2 xy)
 #else
 	vec4 col = texelFetch(Texture, xy, 0);
 #endif
-	return int(col.r * exp2(32.0f));
+	return int(min(col.r * exp2(32.0f), 2147483647.0f));
 }
 
 vec4 fetch_raw_color(ivec2 xy)
@@ -671,7 +671,7 @@ vec4 sample_depth(vec2 st, ivec2 pos)
 		// Based on ps_convert_float32_rgba8 of convert
 
 		// Convert a vec32 depth texture into a RGBA color texture
-		uint d = uint(fetch_c(uv).r * exp2(32.0f));
+		uint d = uint(min(fetch_c(uv).r * exp2(32.0f), 4294967295.0f));
 		t = vec4(uvec4((d & 0xFFu), ((d >> 8) & 0xFFu), ((d >> 16) & 0xFFu), (d >> 24)));
 	}
 	#elif (PS_DEPTH_FMT == 2)
@@ -679,7 +679,7 @@ vec4 sample_depth(vec2 st, ivec2 pos)
 		// Based on ps_convert_float16_rgb5a1 of convert
 
 		// Convert a vec32 (only 16 lsb) depth into a RGB5A1 color texture
-		uint d = uint(fetch_c(uv).r * exp2(32.0f));
+		uint d = uint(min(fetch_c(uv).r * exp2(32.0f), 4294967295.0f));
 		t = vec4(uvec4((d & 0x1Fu), ((d >> 5) & 0x1Fu), ((d >> 10) & 0x1Fu), (d >> 15) & 0x01u)) * vec4(8.0f, 8.0f, 8.0f, 128.0f);
 	}
 	#elif (PS_DEPTH_FMT == 3)

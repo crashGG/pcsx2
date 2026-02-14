@@ -391,7 +391,7 @@ int fetch_raw_depth(int2 xy)
 #else
 	float4 col = Texture.Load(int3(xy, 0));
 #endif
-	return (int)(col.r * exp2(32.0f));
+	return (int)(min(col.r * exp2(32.0f), 2147483647.0f));
 }
 
 float4 fetch_raw_color(int2 xy)
@@ -495,7 +495,7 @@ float4 sample_depth(float2 st, float2 pos)
 		// Based on ps_convert_float32_rgba8 of convert
 
 		// Convert a FLOAT32 depth texture into a RGBA color texture
-		uint d = uint(fetch_c(uv).r * exp2(32.0f));
+		uint d = uint(min(fetch_c(uv).r * exp2(32.0f), 4294967295.0f));
 		t = float4(uint4((d & 0xFFu), ((d >> 8) & 0xFFu), ((d >> 16) & 0xFFu), (d >> 24)));
 	}
 	else if (PS_DEPTH_FMT == 2)
@@ -503,7 +503,7 @@ float4 sample_depth(float2 st, float2 pos)
 		// Based on ps_convert_float16_rgb5a1 of convert
 
 		// Convert a FLOAT32 (only 16 lsb) depth into a RGB5A1 color texture
-		uint d = uint(fetch_c(uv).r * exp2(32.0f));
+		uint d = uint(min(fetch_c(uv).r * exp2(32.0f), 4294967295.0f));
 		t = float4(uint4((d & 0x1Fu), ((d >> 5) & 0x1Fu), ((d >> 10) & 0x1Fu), (d >> 15) & 0x01u)) * float4(8.0f, 8.0f, 8.0f, 128.0f);
 	}
 	else if (PS_DEPTH_FMT == 3)

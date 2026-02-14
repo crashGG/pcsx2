@@ -170,7 +170,7 @@ void ps_colclip_resolve()
 void ps_convert_float32_32bits()
 {
 	// Convert a vec32 depth texture into a 32 bits UINT texture
-	o_col0 = uint(exp2(32.0f) * sample_c(v_tex).r);
+	o_col0 = uint(min(exp2(32.0f) * sample_c(v_tex).r, 4294967295.0f));
 }
 #endif
 
@@ -178,7 +178,7 @@ void ps_convert_float32_32bits()
 void ps_convert_float32_rgba8()
 {
 	// Convert a vec32 depth texture into a RGBA color texture
-	uint d = uint(sample_c(v_tex).r * exp2(32.0f));
+	uint d = uint(min(sample_c(v_tex).r * exp2(32.0f), 4294967295.0f));
 	o_col0 = vec4(uvec4((d & 0xFFu), ((d >> 8) & 0xFFu), ((d >> 16) & 0xFFu), (d >> 24))) / vec4(255.0);
 }
 #endif
@@ -187,7 +187,7 @@ void ps_convert_float32_rgba8()
 void ps_convert_float16_rgb5a1()
 {
 	// Convert a vec32 (only 16 lsb) depth into a RGB5A1 color texture
-	uint d = uint(sample_c(v_tex).r * exp2(32.0f));
+	uint d = uint(min(sample_c(v_tex).r * exp2(32.0f), 4294967295.0f));
 	o_col0 = vec4(uvec4(d << 3, d >> 2, d >> 7, d >> 8) & uvec4(0xf8, 0xf8, 0xf8, 0x80)) / 255.0f;
 }
 #endif
@@ -220,7 +220,7 @@ float rgb5a1_to_depth16(vec4 unorm)
 void ps_convert_float32_float24()
 {
 	// Truncates depth value to 24bits
-	uint d = uint(sample_c(v_tex).r * exp2(32.0f)) & 0xFFFFFFu;
+	uint d = uint(min(sample_c(v_tex).r * exp2(32.0f), 4294967295.0f)) & 0xFFFFFFu;
 	gl_FragDepth = float(d) * exp2(-32.0f);
 }
 #endif
