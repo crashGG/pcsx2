@@ -556,14 +556,14 @@ mat4 sample_4p(uvec4 u)
 	return c;
 }
 
-int fetch_raw_depth(ivec2 xy)
+uint fetch_raw_depth(ivec2 xy)
 {
 #if PS_TEX_IS_FB
 	vec4 col = sample_from_rt();
 #else
 	vec4 col = texelFetch(Texture, xy, 0);
 #endif
-	return int(min(col.r * exp2(32.0f), 2147483647.0f));
+	return uint(min(col.r * exp2(32.0f), 4294967295.0f));
 }
 
 vec4 fetch_raw_color(ivec2 xy)
@@ -642,7 +642,7 @@ vec4 sample_depth(vec2 st, ivec2 pos)
 	#if (PS_TALES_OF_ABYSS_HLE == 1)
 	{
 		// Warning: UV can't be used in channel effect
-		int depth = fetch_raw_depth(pos);
+		uint depth = fetch_raw_depth(pos);
 
 		// Convert msb based on the palette
 		t = texelFetch(Palette, ivec2((depth >> 8) & 0xFF, 0), 0) * 255.0f;
@@ -656,7 +656,7 @@ vec4 sample_depth(vec2 st, ivec2 pos)
 		// To be faster both steps (msb&lsb) are done in a single pass.
 
 		// Warning: UV can't be used in channel effect
-		int depth = fetch_raw_depth(pos);
+		uint depth = fetch_raw_depth(pos);
 
 		// Convert lsb based on the palette
 		t = texelFetch(Palette, ivec2(depth & 0xFF, 0), 0) * 255.0f;
@@ -715,7 +715,7 @@ vec4 fetch_red(ivec2 xy)
 	vec4 rt;
 
 	#if (PS_DEPTH_FMT == 1) || (PS_DEPTH_FMT == 2)
-		int depth = (fetch_raw_depth(xy)) & 0xFF;
+		uint depth = (fetch_raw_depth(xy)) & 0xFF;
 		rt = vec4(float(depth) / 255.0f);
 	#else
 		rt = fetch_raw_color(xy);
@@ -729,7 +729,7 @@ vec4 fetch_green(ivec2 xy)
 	vec4 rt;
 
 	#if (PS_DEPTH_FMT == 1) || (PS_DEPTH_FMT == 2)
-		int depth = (fetch_raw_depth(xy) >> 8) & 0xFF;
+		uint depth = (fetch_raw_depth(xy) >> 8) & 0xFF;
 		rt = vec4(float(depth) / 255.0f);
 	#else
 		rt = fetch_raw_color(xy);
@@ -743,7 +743,7 @@ vec4 fetch_blue(ivec2 xy)
 	vec4 rt;
 
 	#if (PS_DEPTH_FMT == 1) || (PS_DEPTH_FMT == 2)
-		int depth = (fetch_raw_depth(xy) >> 16) & 0xFF;
+		uint depth = (fetch_raw_depth(xy) >> 16) & 0xFF;
 		rt = vec4(float(depth) / 255.0f);
 	#else
 		rt = fetch_raw_color(xy);
@@ -768,8 +768,8 @@ vec4 fetch_rgb(ivec2 xy)
 vec4 fetch_gXbY(ivec2 xy)
 {
 	#if (PS_DEPTH_FMT == 1) || (PS_DEPTH_FMT == 2)
-		int depth = fetch_raw_depth(xy);
-		int bg = (depth >> (8 + ChannelShuffle.w)) & 0xFF;
+		uint depth = fetch_raw_depth(xy);
+		uint bg = (depth >> (8 + ChannelShuffle.w)) & 0xFF;
 		return vec4(bg);
 	#else
 		ivec4 rt = ivec4(fetch_raw_color(xy) * 255.0);
